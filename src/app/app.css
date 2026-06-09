@@ -420,6 +420,157 @@ section {
   color: var(--ink-muted);
 }
 
+/* ── Онлайн-школа Alunera ───────────────────────────────────────────── */
+.alunera {
+  --accent: var(--green);
+  --accent-soft: rgba(34, 197, 94, 0.1);
+}
+.alunera__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding: clamp(2.2rem, 5vw, 3.6rem);
+  background:
+    radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--green) 16%, transparent) 0%, transparent 55%),
+    color-mix(in srgb, var(--green) 6%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--green) 24%, var(--line));
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.alunera__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--green-dark);
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+}
+.alunera__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 22%, transparent);
+}
+.alunera__title {
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  line-height: 1;
+  background: linear-gradient(120deg, var(--green-dark), var(--green) 60%, #6ee7a8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.alunera__lead {
+  margin-top: 1.1rem;
+  max-width: 52ch;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+.alunera__points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+}
+.alunera__points li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.98rem;
+  color: var(--ink);
+}
+.alunera__check {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--green-dark);
+  flex: none;
+}
+.alunera__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Визуал: три поколения вокруг финансового ядра */
+.alunera__visual {
+  display: grid;
+  place-items: center;
+}
+.alunera__orbit {
+  position: relative;
+  width: min(330px, 80vw);
+  aspect-ratio: 1;
+}
+.alunera__orbit::before,
+.alunera__orbit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--green) 35%, transparent);
+}
+.alunera__orbit::before { width: 100%; height: 100%; animation: orbit-spin 26s linear infinite; }
+.alunera__orbit::after { width: 62%; height: 62%; border-style: solid; opacity: 0.5; }
+.alunera__core {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 86px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  color: #fff;
+  box-shadow: 0 16px 36px -12px var(--green);
+  z-index: 2;
+}
+.alunera__core svg { width: 42px; height: 42px; }
+.gen {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 0.5rem 0.4rem;
+  width: 86px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--green) 26%, var(--line));
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  animation: floaty 8s ease-in-out infinite;
+}
+.gen svg {
+  width: 26px;
+  height: 26px;
+  color: var(--green-dark);
+}
+.gen em {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.gen--1 { top: -6%; left: 50%; margin-left: -43px; animation-delay: 0s; }
+.gen--2 { bottom: 8%; left: -4%; animation-delay: -2.6s; }
+.gen--3 { bottom: 8%; right: -4%; animation-delay: -5.2s; }
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Философия / опоры ──────────────────────────────────────────────── */
 .philosophy__grid {
   display: grid;
@@ -1265,6 +1416,8 @@ section {
 @media (max-width: 980px) {
   .philosophy__grid { grid-template-columns: repeat(2, 1fr); }
   .balance__grid { grid-template-columns: 1fr; }
+  .alunera__inner { grid-template-columns: 1fr; }
+  .alunera__visual { order: -1; }
   .social__links { grid-template-columns: repeat(2, 1fr); }
   .social__videos { grid-template-columns: 1fr; gap: 1.2rem; }
   .contact { grid-template-columns: 1fr; }
