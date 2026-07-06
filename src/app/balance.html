@@ -1,0 +1,234 @@
+<section class="wheel-page">
+  <div class="wheel-page__inner">
+    <div class="wheel-page__head">
+      <a class="wheel-page__back" routerLink="/">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        На главную
+      </a>
+      <span class="section__eyebrow">Интерактивная диагностика</span>
+      <h1 class="section__title">Колесо баланса жизни</h1>
+      @if (phase() === 'quiz') {
+        <p class="section__sub">
+          Ответьте на несколько вопросов о четырёх сферах жизни. По ответам
+          построится колесо баланса, а по дате рождения — нумерологический разбор,
+          связанный с вашим колесом.
+        </p>
+      }
+    </div>
+
+    @if (phase() === 'quiz') {
+      <!-- ── ОПРОСНИК ──────────────────────────────────────────────────── -->
+      <div class="quiz">
+        <div class="quiz__progress">
+          <span class="quiz__progress-track">
+            <span class="quiz__progress-bar" [style.width.%]="progressPct()"></span>
+          </span>
+          <span class="quiz__count">Шаг {{ step() + 1 }} из {{ totalSteps }}</span>
+        </div>
+
+        @switch (currentStep().kind) {
+          @case ('name') {
+            <div class="quiz__card quiz__card--field">
+              <span class="quiz__sphere"><span class="quiz__sphere-dot"></span> Знакомство</span>
+              <h2 class="quiz__question">Как вас зовут?</h2>
+              <p class="quiz__field-hint">Обращусь к вам лично в результатах диагностики.</p>
+              <input
+                class="quiz__input"
+                type="text"
+                [ngModel]="name()"
+                (ngModelChange)="name.set($event)"
+                (keyup.enter)="advance()"
+                placeholder="Ваше имя"
+                autocomplete="given-name"
+              />
+              <div class="quiz__nav quiz__nav--field">
+                <button type="button" class="btn btn--ghost" (click)="back()" [disabled]="step() === 0">Назад</button>
+                <button type="button" class="btn btn--primary" (click)="advance()" [disabled]="!canAdvance()">Далее</button>
+              </div>
+            </div>
+          }
+          @case ('date') {
+            <div class="quiz__card quiz__card--field">
+              <span class="quiz__sphere"><span class="quiz__sphere-dot"></span> Нумерология</span>
+              <h2 class="quiz__question">Когда вы родились?</h2>
+              <p class="quiz__field-hint">
+                По дате рождения рассчитаю число жизненного пути и свяжу его с вашим колесом баланса.
+              </p>
+              <input
+                class="quiz__input"
+                type="date"
+                [max]="maxDate"
+                [ngModel]="birthDate()"
+                (ngModelChange)="birthDate.set($event)"
+              />
+              <div class="quiz__nav quiz__nav--field">
+                <button type="button" class="btn btn--ghost" (click)="back()" [disabled]="step() === 0">Назад</button>
+                <button type="button" class="btn btn--primary" (click)="advance()" [disabled]="!canAdvance()">Далее</button>
+              </div>
+            </div>
+          }
+          @case ('scale') {
+            <div class="quiz__card" [style.--accent]="currentCategory()?.accent" [style.--accent-soft]="currentCategory()?.accentSoft">
+              <span class="quiz__sphere">
+                <span class="quiz__sphere-dot"></span>
+                {{ currentCategory()?.title }}
+              </span>
+              <h2 class="quiz__question">{{ currentScale()?.text }}</h2>
+
+              <div class="quiz__scale">
+                @for (opt of scale; track opt.value) {
+                  <button
+                    type="button"
+                    class="quiz__opt"
+                    [class.quiz__opt--active]="currentAnswer() === opt.value"
+                    (click)="answer(opt.value)"
+                  >
+                    <span class="quiz__opt-num">{{ opt.value }}</span>
+                    <span class="quiz__opt-label">{{ opt.label }}</span>
+                  </button>
+                }
+              </div>
+
+              <div class="quiz__nav">
+                <button type="button" class="btn btn--ghost" (click)="back()" [disabled]="step() === 0">
+                  Назад
+                </button>
+                <span class="quiz__hint">Выберите вариант, чтобы продолжить</span>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    } @else {
+      <!-- ── РЕЗУЛЬТАТ: КОЛЕСО + НУМЕРОЛОГИЯ + РУЧНАЯ НАСТРОЙКА ─────────── -->
+      <div class="wheel-result">
+        @if (store.name()) {
+          <p class="wheel-result__greet">
+            Готово, {{ store.name() }}! Вот ваша картина баланса и нумерологический разбор.
+          </p>
+        }
+
+        <div class="wheel-result__top">
+          <div class="radar">
+            <svg viewBox="0 0 200 200" class="radar__svg" aria-hidden="true">
+              @for (ring of [80, 60, 40, 20]; track ring) {
+                <polygon
+                  class="radar__ring"
+                  [attr.points]="
+                    100 + ',' + (100 - ring) + ' ' +
+                    (100 + ring) + ',' + 100 + ' ' +
+                    100 + ',' + (100 + ring) + ' ' +
+                    (100 - ring) + ',' + 100
+                  "
+                />
+              }
+              <line class="radar__axis" x1="100" y1="20" x2="100" y2="180" />
+              <line class="radar__axis" x1="20" y1="100" x2="180" y2="100" />
+              <polygon class="radar__shape" [attr.points]="store.radarPoints()" />
+            </svg>
+
+            <span class="radar__label radar__label--top">Ментальное</span>
+            <span class="radar__label radar__label--right">Финансы</span>
+            <span class="radar__label radar__label--bottom">Физическое</span>
+            <span class="radar__label radar__label--left">Семья</span>
+
+            <div class="radar__score">
+              <span class="radar__score-value">{{ store.harmonyScore() }}%</span>
+              <span class="radar__score-text">гармония</span>
+            </div>
+          </div>
+
+          <div class="balance__reco" [style.--accent]="store.weakestCategory().accent">
+            <span class="balance__reco-tag">Рекомендую начать с этого</span>
+            <h3 class="balance__reco-title">{{ store.recommendedProduct().title }}</h3>
+            <p class="balance__reco-desc">{{ store.recommendedProduct().summary }}</p>
+            <div class="balance__reco-footer">
+              <span class="balance__reco-cat">{{ store.weakestCategory().title }}</span>
+              <button class="btn btn--primary" (click)="openRecommended()">
+                Подробнее · {{ formatPrice(store.recommendedProduct()) }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Нумерологический разбор (полная версия) -->
+        @if (store.numerology(); as num) {
+          <div
+            class="numero"
+            [style.--accent]="store.numerologyInsight()?.sphere?.accent"
+            [style.--accent-soft]="store.numerologyInsight()?.sphere?.accentSoft"
+          >
+            <div class="numero__head">
+              <div class="numero__badge">{{ num.number }}</div>
+              <div>
+                <span class="numero__eyebrow">Число жизненного пути</span>
+                <h3 class="numero__title">{{ num.title }}</h3>
+                <p class="numero__essence">{{ num.essence }}</p>
+              </div>
+            </div>
+
+            <p class="numero__desc">{{ num.description }}</p>
+
+            <div class="numero__strengths">
+              @for (s of num.strengths; track s) {
+                <span class="numero__tag">{{ s }}</span>
+              }
+            </div>
+
+            @if (store.numerologyInsight(); as ins) {
+              <div class="numero__link">
+                <span class="numero__link-title">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Связь с колесом баланса
+                </span>
+                <p>{{ ins.message }}</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Ручная настройка — доступна только после прохождения теста -->
+        <div class="wheel-edit">
+          <div class="wheel-edit__head">
+            <span class="wheel-edit__badge">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Тест пройден
+            </span>
+            <h3 class="wheel-edit__title">Точная настройка колеса</h3>
+            <p class="wheel-edit__sub">
+              Теперь вы можете вручную скорректировать любую сферу — график и
+              рекомендация обновятся вживую.
+            </p>
+          </div>
+
+          <div class="sliders">
+            @for (cat of categories; track cat.id) {
+              <div class="slider" [style.--accent]="cat.accent">
+                <div class="slider__head">
+                  <span class="slider__name">{{ cat.title }}</span>
+                  <span class="slider__value">{{ store.balance()[cat.id] }}</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="1"
+                  [value]="store.balance()[cat.id]"
+                  (input)="store.setBalance(cat.id, $any($event.target).valueAsNumber)"
+                  [attr.aria-label]="'Оценка сферы ' + cat.title"
+                />
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn btn--ghost wheel-edit__restart" (click)="restart()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Пройти тест заново
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</section>

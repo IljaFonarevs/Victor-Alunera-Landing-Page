@@ -33,6 +33,12 @@ export interface Product {
   badge?: string;
 }
 
+/** Форматирует цену продукта для отображения (напр. «49 $»). */
+export function formatPrice(product: Product): string {
+  const symbol = product.currency === 'USD' ? '$' : product.currency;
+  return `${product.price} ${symbol}`;
+}
+
 export interface Category {
   id: CategoryId;
   /** Порядковый номер (для нумерации секций) */
